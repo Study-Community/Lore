@@ -9,14 +9,113 @@ socketio = SocketIO(app)
 chat_history = {}
 user_balances = {}
 
+functions = [
+    "Art",
+    "Computer Science",
+    "Economics",
+    "English",
+    "Geography",
+    "History",
+    "Math",
+    "Music",
+    "Physical Education",
+    "Science"
+]
+
+knowledge_areas = {
+    "Math": [
+        "Algebra",
+        "Geometry",
+        "Calculus",
+        "Statistics",
+        "Trigonometry",
+        "Number Theory",
+    ]
+    # Add other subjects and their subitems here
+}
+
 @app.route('/')
 def home():
     return render_template_string('''
         <h1>Welcome</h1>
-        <a href="{{ url_for('function1') }}">Social System</a><br>
-        <a href="{{ url_for('function2') }}">Function 2</a>
+        <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a><br>
+        <a href="{{ url_for('multi_function_box') }}">Multi Function Box</a>
     ''')
 
+# Knowledge Base Routes
+@app.route('/knowledge_base')
+def knowledge_base():
+    session['history'] = []  # Initialize history in session
+    return render_template_string('''
+        <h1>Knowledge Base</h1>
+        <form method="post" action="/choose">
+            {% for function in functions %}
+                <button type="submit" name="function" value="{{ function }}">{{ function }}</button>
+            {% endfor %}
+        </form>
+        <a href="{{ url_for('home') }}">Home</a>
+    ''', functions=functions)
+
+@app.route('/choose', methods=['POST'])
+def choose():
+    chosen_function = request.form['function']
+    branches = knowledge_areas.get(chosen_function, ["No branches available."])
+    
+    if 'history' not in session:
+        session['history'] = []
+    session['history'].append(chosen_function)
+    session.modified = True
+
+    return render_template_string('''
+        <h1>{{ chosen_function }}</h1>
+        <form method="post" action="/branch">
+            {% for branch in branches %}
+                <button type="submit" name="branch" value="{{ branch }}">{{ branch }}</button>
+            {% endfor %}
+        </form>
+        <a href="{{ url_for('back') }}">Back</a>
+    ''', chosen_function=chosen_function, branches=branches)
+
+@app.route('/branch', methods=['POST'])
+def branch():
+    chosen_branch = request.form['branch']
+    
+    if 'history' not in session:
+        session['history'] = []
+    session['history'].append(chosen_branch)
+    session.modified = True
+
+    return render_template_string('''
+        <h1>{{ chosen_branch }}</h1>
+        <p>Content for {{ chosen_branch }}</p>
+        <a href="{{ url_for('back') }}">Back</a>
+    ''', chosen_branch=chosen_branch)
+
+@app.route('/back')
+def back():
+    if 'history' in session and session['history']:
+        session['history'].pop()  # Remove the current layer
+        if session['history']:
+            last_area = session['history'][-1]
+            if last_area in knowledge_areas:
+                return redirect(url_for('choose'))
+            else:
+                return redirect(url_for('branch'))
+    return redirect(url_for('knowledge_base'))
+
+# Multi Function Box Routes
+@app.route('/multi_function_box')
+def multi_function_box():
+    return render_template_string('''
+        <h1>Multi Function Box</h1>
+        <ul>
+            <li><a href="{{ url_for('function1') }}">Social System</a></li>
+            <li><a href="{{ url_for('function2') }}">Function 2</a></li>
+        </ul>
+        <a href="{{ url_for('home') }}">Home</a>
+    ''')
+
+# Social System Routes
 @app.route('/function1', methods=['GET', 'POST'])
 def function1():
     if request.method == 'POST' and 'amount' in request.form:
@@ -104,7 +203,7 @@ def function1():
             <input type="text" id="uid" name="uid" required>
             <button type="submit">Start</button>
         </form>
-        <a href="{{ url_for('home') }}">Back</a>
+        <a href="{{ url_for('multi_function_box') }}">Back</a>
     ''')
 
 @app.route('/function2')
@@ -112,7 +211,7 @@ def function2():
     return render_template_string('''
         <h1>Empty Function</h1>
         <p>This function is currently empty.</p>
-        <a href="{{ url_for('home') }}">Back</a>
+        <a href="{{ url_for('multi_function_box') }}">Back</a>
     ''')
 
 @socketio.on('join')
