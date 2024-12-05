@@ -5,9 +5,10 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session management
 socketio = SocketIO(app)
 
-# In-memory dictionary to store chat history and user balances
+# In-memory dictionaries to store chat history, user balances, and research papers
 chat_history = {}
 user_balances = {}
+research_papers = {}
 
 functions = [
     "Art",
@@ -150,6 +151,7 @@ def home():
     return render_template_string('''
         <h1>Welcome</h1>
         <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a><br>
+        <a href="{{ url_for('explore_system') }}">Explore System</a><br>
         <a href="{{ url_for('function1') }}">Social System</a><br>
         <a href="{{ url_for('function2') }}">Empty Function</a>
     ''')
@@ -190,6 +192,11 @@ def choose():
                 <button type="submit" name="branch" value="{{ branch }}">{{ branch }}</button>
             {% endfor %}
         </form>
+        <p>Content for {{ chosen_function }}</p>
+        <form method="post" action="/post_research">
+            <input type="hidden" name="branch" value="{{ chosen_function }}">
+            <button type="submit">Post Research</button>
+        </form>
     ''', chosen_function=chosen_function, branches=branches)
 
 @app.route('/branch', methods=['POST'])
@@ -207,7 +214,97 @@ def branch():
         </div>
         <h1>{{ chosen_branch }}</h1>
         <p>Content for {{ chosen_branch }}</p>
+        <form method="post" action="/post_research">
+            <input type="hidden" name="branch" value="{{ chosen_branch }}">
+            <button type="submit" class="subitem">Post Research</button>
+        </form>
     ''', chosen_branch=chosen_branch)
+
+@app.route('/post_research', methods=['POST'])
+def post_research():
+    branch = request.form['branch']
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Post Research in {{ branch }}</h1>
+        <form method="post" action="/publish_research">
+            <input type="hidden" name="branch" value="{{ branch }}">
+            <textarea name="research_content" rows="10" cols="50" placeholder="Write your research here..."></textarea><br>
+            <button type="submit">Publish</button>
+        </form>
+    ''', branch=branch)
+
+@app.route('/publish_research', methods=['POST'])
+def publish_research():
+    branch = request.form['branch']
+    research_content = request.form['research_content']
+    if branch not in research_papers:
+        research_papers[branch] = []
+    research_papers[branch].append(research_content)
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Research Published in {{ branch }}</h1>
+        <p>{{ research_content }}</p>
+        <a href="{{ url_for('explore_system') }}">Explore System</a>
+    ''', branch=branch, research_content=research_content)
+
+@app.route('/explore_system')
+def explore_system():
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Explore System</h1>
+        <ul>
+            {% for main_area, branches in knowledge_areas.items() %}
+                <li>
+                    <h2><a href="{{ url_for('view_research', area=main_area) }}">{{ main_area }}</a></h2>
+                    <ul>
+                        {% for branch in branches %}
+                            <li>
+                                <h3><a href="{{ url_for('view_branch_research', branch=branch) }}">{{ branch }}</a></h3>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    ''', knowledge_areas=knowledge_areas)
+
+@app.route('/view_research/<area>')
+def view_research(area):
+    papers = research_papers.get(area, [])
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Research in {{ area }}</h1>
+        <ul>
+            {% for paper in papers %}
+                <li>{{ paper }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+    ''', area=area, papers=papers)
+
+@app.route('/view_branch_research/<branch>')
+def view_branch_research(branch):
+    papers = research_papers.get(branch, [])
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Research in {{ branch }}</h1>
+        <ul>
+            {% for paper in papers %}
+                <li>{{ paper }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+    ''', branch=branch, papers=papers)
 
 # Social System Routes
 @app.route('/function1', methods=['GET', 'POST'])
@@ -330,7 +427,6 @@ def handle_message(data):
     msg = data['msg']
     chat_history.setdefault(uid, []).append(msg)
     send(msg, to=uid)
-
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5008, debug=True)
