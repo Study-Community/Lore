@@ -1,150 +1,11 @@
 from flask import Flask, render_template_string, request, session, redirect, url_for
 from flask_socketio import SocketIO, join_room, leave_room, send
+import random
+from data import chat_history, user_balances, research_papers, rules, functions, knowledge_areas
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session management
 socketio = SocketIO(app)
-
-# In-memory dictionaries to store chat history, user balances, and research papers
-chat_history = {}
-user_balances = {}
-research_papers = {}
-
-functions = [
-    "Art",
-    "Computer Science",
-    "Economics",
-    "English",
-    "Geography",
-    "History",
-    "Math",
-    "Music",
-    "Physical Education",
-    "Science"
-]
-
-knowledge_areas = {
-    "Art": [
-        "Painting",
-        "Sculpture",
-        "Photography",
-        "Drawing",
-        "Printmaking",
-        "Ceramics",
-        "Textiles",
-        "Digital Art",
-        "Art History",
-        "Graphic Design"
-    ],
-    "Computer Science": [
-        "Algorithms",
-        "Data Structures",
-        "Operating Systems",
-        "Databases",
-        "Networking",
-        "Artificial Intelligence",
-        "Machine Learning",
-        "Cybersecurity",
-        "Software Engineering",
-        "Web Development"
-    ],
-    "Economics": [
-        "Microeconomics",
-        "Macroeconomics",
-        "International Economics",
-        "Development Economics",
-        "Labor Economics",
-        "Public Economics",
-        "Health Economics",
-        "Environmental Economics",
-        "Behavioral Economics",
-        "Econometrics"
-    ],
-    "English": [
-        "Literature",
-        "Creative Writing",
-        "Linguistics",
-        "Grammar",
-        "Composition",
-        "Rhetoric",
-        "Poetry",
-        "Drama",
-        "Prose",
-        "Literary Theory"
-    ],
-    "Geography": [
-        "Physical Geography",
-        "Human Geography",
-        "Cartography",
-        "Geographic Information Systems",
-        "Urban Geography",
-        "Environmental Geography",
-        "Economic Geography",
-        "Political Geography",
-        "Cultural Geography",
-        "Historical Geography"
-    ],
-    "History": [
-        "Ancient History",
-        "Medieval History",
-        "Modern History",
-        "World History",
-        "Military History",
-        "Social History",
-        "Economic History",
-        "Cultural History",
-        "Political History",
-        "Historiography"
-    ],
-    "Math": [
-        "Algebra",
-        "Geometry",
-        "Calculus",
-        "Statistics",
-        "Trigonometry",
-        "Number Theory",
-        "Combinatorics",
-        "Probability",
-        "Linear Algebra",
-        "Differential Equations"
-    ],
-    "Music": [
-        "Music Theory",
-        "Composition",
-        "Music History",
-        "Performance",
-        "Conducting",
-        "Music Technology",
-        "Ethnomusicology",
-        "Jazz Studies",
-        "Music Education",
-        "Music Therapy"
-    ],
-    "Physical Education": [
-        "Exercise Physiology",
-        "Kinesiology",
-        "Sports Psychology",
-        "Motor Learning",
-        "Biomechanics",
-        "Sports Nutrition",
-        "Adapted Physical Education",
-        "Health Education",
-        "Sports Management",
-        "Coaching"
-    ],
-    "Science": [
-        "Physics",
-        "Chemistry",
-        "Biology",
-        "Earth Science",
-        "Astronomy",
-        "Environmental Science",
-        "Materials Science",
-        "Genetics",
-        "Ecology",
-        "Geology"
-    ]
-}
 
 @app.route('/')
 def home():
@@ -152,6 +13,8 @@ def home():
         <h1>Welcome</h1>
         <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a><br>
         <a href="{{ url_for('explore_system') }}">Explore System</a><br>
+        <a href="{{ url_for('learn_system') }}">Learn System</a><br>
+        <a href="{{ url_for('exam_system') }}">Exam System</a><br>
         <a href="{{ url_for('function1') }}">Social System</a><br>
         <a href="{{ url_for('function2') }}">Empty Function</a>
     ''')
@@ -176,6 +39,7 @@ def knowledge_base():
 def choose():
     chosen_function = request.form['function']
     branches = knowledge_areas.get(chosen_function, ["No branches available."])
+    important_rules = rules.get(chosen_function, [])
     
     if 'history' not in session:
         session['history'] = []
@@ -193,15 +57,21 @@ def choose():
             {% endfor %}
         </form>
         <p>Content for {{ chosen_function }}</p>
+        <ul>
+            {% for rule in important_rules %}
+                <li>{{ rule }}</li>
+            {% endfor %}
+        </ul>
         <form method="post" action="/post_research">
             <input type="hidden" name="branch" value="{{ chosen_function }}">
             <button type="submit">Post Research</button>
         </form>
-    ''', chosen_function=chosen_function, branches=branches)
+    ''', chosen_function=chosen_function, branches=branches, important_rules=important_rules)
 
 @app.route('/branch', methods=['POST'])
 def branch():
     chosen_branch = request.form['branch']
+    important_rules = rules.get(chosen_branch, [])
     
     if 'history' not in session:
         session['history'] = []
@@ -214,11 +84,16 @@ def branch():
         </div>
         <h1>{{ chosen_branch }}</h1>
         <p>Content for {{ chosen_branch }}</p>
+        <ul>
+            {% for rule in important_rules %}
+                <li>{{ rule }}</li>
+            {% endfor %}
+        </ul>
         <form method="post" action="/post_research">
             <input type="hidden" name="branch" value="{{ chosen_branch }}">
             <button type="submit" class="subitem">Post Research</button>
         </form>
-    ''', chosen_branch=chosen_branch)
+    ''', chosen_branch=chosen_branch, important_rules=important_rules)
 
 @app.route('/post_research', methods=['POST'])
 def post_research():
@@ -305,6 +180,111 @@ def view_branch_research(branch):
         </ul>
         <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
     ''', branch=branch, papers=papers)
+
+# Learn System Routes
+@app.route('/learn_system', methods=['GET', 'POST'])
+def learn_system():
+    if request.method == 'POST':
+        chosen_topic = request.form['topic']
+        if chosen_topic in rules:
+            rule = random.choice(rules[chosen_topic])
+            return render_template_string('''
+                <div style="text-align: right;">
+                    <a href="{{ url_for('home') }}">Home</a>
+                </div>
+                <h1>Learn System</h1>
+                <p>Topic: {{ chosen_topic }}</p>
+                <p>Rule: {{ rule }}</p>
+                <form method="post" action="/learn_system">
+                    <input type="hidden" name="topic" value="{{ chosen_topic }}">
+                    <button type="submit" name="action" value="master">Master</button>
+                    <button type="submit" name="action" value="forget">Forget</button>
+                </form>
+            ''', chosen_topic=chosen_topic, rule=rule)
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Learn System</h1>
+        <form method="post" action="/learn_system">
+            <label for="topic">Choose a topic:</label>
+            <select id="topic" name="topic">
+                {% for function, branches in knowledge_areas.items() %}
+                    <option value="{{ function }}">{{ function }}</option>
+                    {% for branch in branches %}
+                        <option value="{{ branch }}">-- {{ branch }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+            <button type="submit">Start Learning</button>
+        </form>
+    ''', knowledge_areas=knowledge_areas)
+
+# Exam System Routes
+@app.route('/exam_system', methods=['GET', 'POST'])
+def exam_system():
+    if request.method == 'POST':
+        chosen_topic = request.form['topic']
+        if chosen_topic in rules:
+            questions = random.sample(rules[chosen_topic], min(5, len(rules[chosen_topic])))
+            session['questions'] = questions
+            session['current_question'] = 0
+            session['score'] = 0
+            return redirect(url_for('take_exam'))
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Exam System</h1>
+        <form method="post" action="/exam_system">
+            <label for="topic">Choose a topic:</label>
+            <select id="topic" name="topic">
+                {% for function, branches in knowledge_areas.items() %}
+                    <option value="{{ function }}">{{ function }}</option>
+                    {% for branch in branches %}
+                        <option value="{{ branch }}">-- {{ branch }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+            <button type="submit">Start Exam</button>
+        </form>
+    ''', knowledge_areas=knowledge_areas)
+
+@app.route('/take_exam', methods=['GET', 'POST'])
+def take_exam():
+    if request.method == 'POST':
+        action = request.form['action']
+        if action == 'correct':
+            session['score'] += 20
+        session['current_question'] += 1
+        if session['current_question'] >= len(session['questions']):
+            return redirect(url_for('exam_result'))
+    current_question = session['questions'][session['current_question']]
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Exam System</h1>
+        <p>Question: {{ current_question }}</p>
+        <form method="post" action="/take_exam">
+            <button type="submit" name="action" value="correct">Correct</button>
+            <button type="submit" name="action" value="incorrect">Incorrect</button>
+        </form>
+    ''', current_question=current_question)
+
+@app.route('/exam_result')
+def exam_result():
+    score = session.get('score', 0)
+    result = "Pass" if score >= 80 else "Fail"
+    return render_template_string('''
+        <div style="text-align: right;">
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <h1>Exam Result</h1>
+        <p>Your score: {{ score }}</p>
+        <p>Result: {{ result }}</p>
+        <a href="{{ url_for('exam_system') }}">Back to Exam System</a>
+    ''', score=score, result=result)
 
 # Social System Routes
 @app.route('/function1', methods=['GET', 'POST'])
