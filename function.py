@@ -297,7 +297,7 @@ def on_join(data):
 @socketio.on('leave')
 def on_leave(data):
     leave_room(data)
-df
+
 @socketio.on('message')
 def handle_message(data):
     uid = data['uid']
