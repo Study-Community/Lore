@@ -1,7 +1,7 @@
 from flask import Flask, render_template_string, request, session, redirect, url_for
 from flask_socketio import SocketIO, join_room, leave_room, send
 import random
-from data import chat_history, user_balances, research_papers, rules, functions, knowledge_areas
+from data import chat_history, user_balances, notes, rules, functions, knowledge_areas
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -26,13 +26,13 @@ def home():
         </head>
         <body>
             <div class="container">
-                <h1>Learn System</h1>
-                <a href="{{ url_for('knowledge_base') }}">Read System</a>
-                <a href="{{ url_for('explore_system') }}">Note System</a>
-                <a href="{{ url_for('learn_system') }}">Study System</a>
+                <h1>Welcome</h1>
+                <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a>
+                <a href="{{ url_for('explore_system') }}">Explore System</a>
+                <a href="{{ url_for('learn_system') }}">Learn System</a>
                 <a href="{{ url_for('exam_system') }}">Exam System</a>
                 <a href="{{ url_for('function1') }}">Social System</a>
-                <a href="{{ url_for('function2') }}">Multi Function</a>
+                <a href="{{ url_for('function2') }}">Empty Function</a>
             </div>
         </body>
         </html>
@@ -43,7 +43,7 @@ def knowledge_base():
     session['history'] = []
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Read System</h1>
+        <h1>Knowledge Base</h1>
         <form method="post" action="/choose">
             {% for function in functions %}
                 <button type="submit" name="function" value="{{ function }}">{{ function }}</button>
@@ -68,7 +68,7 @@ def choose():
         </form>
         <p>Content for {{ chosen_function }}</p>
         <ul>{% for rule in important_rules %}<li>{{ rule }}</li>{% endfor %}</ul>
-        <form method="post" action="/post_research">
+        <form method="post" action="/post_note">
             <input type="hidden" name="branch" value="{{ chosen_function }}">
             <button type="submit">Take Note</button>
         </form>
@@ -85,49 +85,49 @@ def branch():
         <h1>{{ chosen_branch }}</h1>
         <p>Content for {{ chosen_branch }}</p>
         <ul>{% for rule in important_rules %}<li>{{ rule }}</li>{% endfor %}</ul>
-        <form method="post" action="/post_research">
+        <form method="post" action="/post_note">
             <input type="hidden" name="branch" value="{{ chosen_branch }}">
             <button type="submit" class="subitem">Take Note</button>
         </form>
     ''', chosen_branch=chosen_branch, important_rules=important_rules)
 
-@app.route('/post_research', methods=['POST'])
-def post_research():
+@app.route('/post_note', methods=['POST'])
+def post_note():
     branch = request.form['branch']
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
         <h1>Take Note in {{ branch }}</h1>
-        <form method="post" action="/publish_research">
+        <form method="post" action="/publish_note">
             <input type="hidden" name="branch" value="{{ branch }}">
-            <textarea name="research_content" rows="10" cols="50" placeholder="Write your research here..."></textarea><br>
+            <textarea name="note_content" rows="10" cols="50" placeholder="Write your note here..."></textarea><br>
             <button type="submit">Publish</button>
         </form>
     ''', branch=branch)
 
-@app.route('/publish_research', methods=['POST'])
-def publish_research():
+@app.route('/publish_note', methods=['POST'])
+def publish_note():
     branch = request.form['branch']
-    research_content = request.form['research_content']
-    research_papers.setdefault(branch, []).append(research_content)
+    note_content = request.form['note_content']
+    notes.setdefault(branch, []).append(note_content)
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Research Published in {{ branch }}</h1>
-        <p>{{ research_content }}</p>
-        <a href="{{ url_for('explore_system') }}">Note System</a>
-    ''', branch=branch, research_content=research_content)
+        <h1>Note Published in {{ branch }}</h1>
+        <p>{{ note_content }}</p>
+        <a href="{{ url_for('explore_system') }}">Explore System</a>
+    ''', branch=branch, note_content=note_content)
 
 @app.route('/explore_system')
 def explore_system():
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Note System</h1>
+        <h1>Explore System</h1>
         <ul>
             {% for main_area, branches in knowledge_areas.items() %}
                 <li>
-                    <h2><a href="{{ url_for('view_research', area=main_area) }}">{{ main_area }}</a></h2>
+                    <h2><a href="{{ url_for('view_notes', area=main_area) }}">{{ main_area }}</a></h2>
                     <ul>
                         {% for branch in branches %}
-                            <li><h3><a href="{{ url_for('view_branch_research', branch=branch) }}">{{ branch }}</a></h3></li>
+                            <li><h3><a href="{{ url_for('view_branch_notes', branch=branch) }}">{{ branch }}</a></h3></li>
                         {% endfor %}
                     </ul>
                 </li>
@@ -135,24 +135,24 @@ def explore_system():
         </ul>
     ''', knowledge_areas=knowledge_areas)
 
-@app.route('/view_research/<area>')
-def view_research(area):
-    papers = research_papers.get(area, [])
+@app.route('/view_notes/<area>')
+def view_notes(area):
+    papers = notes.get(area, [])
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Research in {{ area }}</h1>
+        <h1>Notes in {{ area }}</h1>
         <ul>{% for paper in papers %}<li>{{ paper }}</li>{% endfor %}</ul>
-        <a href="{{ url_for('explore_system') }}">Back to Note System</a>
+        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
     ''', area=area, papers=papers)
 
-@app.route('/view_branch_research/<branch>')
-def view_branch_research(branch):
-    papers = research_papers.get(branch, [])
+@app.route('/view_branch_notes/<branch>')
+def view_branch_notes(branch):
+    papers = notes.get(branch, [])
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Research in {{ branch }}</h1>
+        <h1>Notes in {{ branch }}</h1>
         <ul>{% for paper in papers %}<li>{{ paper }}</li>{% endfor %}</ul>
-        <a href="{{ url_for('explore_system') }}">Back to Note System</a>
+        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
     ''', branch=branch, papers=papers)
 
 @app.route('/learn_system', methods=['GET', 'POST'])
@@ -163,7 +163,7 @@ def learn_system():
             rule = random.choice(rules[chosen_topic])
             return render_template_string('''
                 <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-                <h1>Study System</h1>
+                <h1>Learn System</h1>
                 <p>Topic: {{ chosen_topic }}</p>
                 <p>Rule: {{ rule }}</p>
                 <form method="post" action="/learn_system">
@@ -174,7 +174,7 @@ def learn_system():
             ''', chosen_topic=chosen_topic, rule=rule)
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Study System</h1>
+        <h1>Learn System</h1>
         <form method="post" action="/learn_system">
             <label for="topic">Choose a topic:</label>
             <select id="topic" name="topic">
@@ -258,7 +258,13 @@ def function1():
         return render_template_string('''
             <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
             <h1>Chat with {{ uid }}</h1>
-            <div id="chat"><ul id="messages">{% for message in chat_history.get(uid, []) %}<li>{{ message }}</li>{% endfor %}</ul></div>
+            <div id="chat">
+                <ul id="messages">
+                    {% for message in chat_history.get(uid, []) %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
             <label for="message">Message:</label>
             <input id="message" autocomplete="off"><button onclick="sendMessage()">Send</button>
             <form method="post" action="/function1">
@@ -269,7 +275,7 @@ def function1():
             </form>
             <p>Payment Successful: You have sent ${{ amount }} to {{ uid }}.</p>
             <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
-            <script>
+            <script type="text/javascript" charset="utf-8">
                 var socket = io();
                 var uid = "{{ uid }}";
                 socket.emit('join', uid);
@@ -290,7 +296,13 @@ def function1():
         return render_template_string('''
             <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
             <h1>Chat with {{ uid }}</h1>
-            <div id="chat"><ul id="messages">{% for message in chat_history.get(uid, []) %}<li>{{ message }}</li>{% endfor %}</ul></div>
+            <div id="chat">
+                <ul id="messages">
+                    {% for message in chat_history.get(uid, []) %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
             <label for="message">Message:</label>
             <input id="message" autocomplete="off"><button onclick="sendMessage()">Send</button>
             <form method="post" action="/function1">
@@ -300,7 +312,7 @@ def function1():
                 <button type="submit">Pay</button>
             </form>
             <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
-            <script>
+            <script type="text/javascript" charset="utf-8">
                 var socket = io();
                 var uid = "{{ uid }}";
                 socket.emit('join', uid);
@@ -330,7 +342,7 @@ def function1():
 def function2():
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Multi Function</h1>
+        <h1>Empty Function</h1>
         <p>This function is currently empty.</p>
     ''')
 
@@ -350,4 +362,4 @@ def handle_message(data):
     send(msg, to=uid)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5002, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5008, debug=True)

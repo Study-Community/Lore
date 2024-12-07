@@ -3,7 +3,7 @@
 # In-memory dictionaries to store chat history, user balances, research papers, and rules
 chat_history = {}
 user_balances = {}
-research_papers = {}
+notes = {}
 rules = {
     "Computer Science": [
         "Operating systems manage hardware resources and provide a platform for running applications and services.",
