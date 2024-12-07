@@ -26,10 +26,10 @@ def home():
         </head>
         <body>
             <div class="container">
-                <h1>Welcome</h1>
-                <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a>
-                <a href="{{ url_for('explore_system') }}">Explore System</a>
-                <a href="{{ url_for('learn_system') }}">Learn System</a>
+                <h1>Learn System</h1>
+                <a href="{{ url_for('knowledge_base') }}">Read System</a>
+                <a href="{{ url_for('explore_system') }}">Note System</a>
+                <a href="{{ url_for('learn_system') }}">Study System</a>
                 <a href="{{ url_for('exam_system') }}">Exam System</a>
                 <a href="{{ url_for('function1') }}">Social System</a>
                 <a href="{{ url_for('function2') }}">Multi Function</a>
@@ -43,7 +43,7 @@ def knowledge_base():
     session['history'] = []
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Knowledge Base</h1>
+        <h1>Read System</h1>
         <form method="post" action="/choose">
             {% for function in functions %}
                 <button type="submit" name="function" value="{{ function }}">{{ function }}</button>
@@ -70,7 +70,7 @@ def choose():
         <ul>{% for rule in important_rules %}<li>{{ rule }}</li>{% endfor %}</ul>
         <form method="post" action="/post_research">
             <input type="hidden" name="branch" value="{{ chosen_function }}">
-            <button type="submit">Post Research</button>
+            <button type="submit">Take Note</button>
         </form>
     ''', chosen_function=chosen_function, branches=branches, important_rules=important_rules)
 
@@ -87,7 +87,7 @@ def branch():
         <ul>{% for rule in important_rules %}<li>{{ rule }}</li>{% endfor %}</ul>
         <form method="post" action="/post_research">
             <input type="hidden" name="branch" value="{{ chosen_branch }}">
-            <button type="submit" class="subitem">Post Research</button>
+            <button type="submit" class="subitem">Take Note</button>
         </form>
     ''', chosen_branch=chosen_branch, important_rules=important_rules)
 
@@ -96,7 +96,7 @@ def post_research():
     branch = request.form['branch']
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Post Research in {{ branch }}</h1>
+        <h1>Take Note in {{ branch }}</h1>
         <form method="post" action="/publish_research">
             <input type="hidden" name="branch" value="{{ branch }}">
             <textarea name="research_content" rows="10" cols="50" placeholder="Write your research here..."></textarea><br>
@@ -113,14 +113,14 @@ def publish_research():
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
         <h1>Research Published in {{ branch }}</h1>
         <p>{{ research_content }}</p>
-        <a href="{{ url_for('explore_system') }}">Explore System</a>
+        <a href="{{ url_for('explore_system') }}">Note System</a>
     ''', branch=branch, research_content=research_content)
 
 @app.route('/explore_system')
 def explore_system():
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Explore System</h1>
+        <h1>Note System</h1>
         <ul>
             {% for main_area, branches in knowledge_areas.items() %}
                 <li>
@@ -142,7 +142,7 @@ def view_research(area):
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
         <h1>Research in {{ area }}</h1>
         <ul>{% for paper in papers %}<li>{{ paper }}</li>{% endfor %}</ul>
-        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+        <a href="{{ url_for('explore_system') }}">Back to Note System</a>
     ''', area=area, papers=papers)
 
 @app.route('/view_branch_research/<branch>')
@@ -152,7 +152,7 @@ def view_branch_research(branch):
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
         <h1>Research in {{ branch }}</h1>
         <ul>{% for paper in papers %}<li>{{ paper }}</li>{% endfor %}</ul>
-        <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+        <a href="{{ url_for('explore_system') }}">Back to Note System</a>
     ''', branch=branch, papers=papers)
 
 @app.route('/learn_system', methods=['GET', 'POST'])
@@ -163,7 +163,7 @@ def learn_system():
             rule = random.choice(rules[chosen_topic])
             return render_template_string('''
                 <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-                <h1>Learn System</h1>
+                <h1>Study System</h1>
                 <p>Topic: {{ chosen_topic }}</p>
                 <p>Rule: {{ rule }}</p>
                 <form method="post" action="/learn_system">
@@ -174,7 +174,7 @@ def learn_system():
             ''', chosen_topic=chosen_topic, rule=rule)
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Learn System</h1>
+        <h1>Study System</h1>
         <form method="post" action="/learn_system">
             <label for="topic">Choose a topic:</label>
             <select id="topic" name="topic">
@@ -350,4 +350,4 @@ def handle_message(data):
     send(msg, to=uid)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5011, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5002, debug=True)
