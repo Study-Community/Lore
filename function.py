@@ -32,7 +32,7 @@ def home():
                 <a href="{{ url_for('learn_system') }}">Learn System</a>
                 <a href="{{ url_for('exam_system') }}">Exam System</a>
                 <a href="{{ url_for('function1') }}">Social System</a>
-                <a href="{{ url_for('function2') }}">Empty Function</a>
+                <a href="{{ url_for('function2') }}">Multi Function</a>
             </div>
         </body>
         </html>
@@ -330,7 +330,7 @@ def function1():
 def function2():
     return render_template_string('''
         <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Empty Function</h1>
+        <h1>Multi Function</h1>
         <p>This function is currently empty.</p>
     ''')
 
@@ -350,4 +350,4 @@ def handle_message(data):
     send(msg, to=uid)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5008, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5011, debug=True)
