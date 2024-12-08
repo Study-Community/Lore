@@ -1394,178 +1394,107 @@ def social_pay():
     if request.method == 'POST' and 'uid' in request.form:
         uid = request.form['uid']
 
-        # Retrieve payment history and balance, initialize balance if user is new
+        # Initialize user balance and payment history if the user is new
         if uid not in user_balances:
             user_balances[uid] = random.randint(0, 100_000)
             payment_history[uid] = []
 
-        user_history = payment_history.get(uid, [])
-        user_balance = int(user_balances[uid])  # Ensure balance is displayed as an integer
+        user_balance = user_balances[uid]
+        user_history = payment_history[uid]
 
         return render_template_string('''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Social Pay</title>
+            <style>
+                body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
+                .container { text-align: center; padding: 20px; }
+                h1, h2, h3 { color: #333; }
+                ul { list-style-type: none; padding: 0; text-align: left; margin: 20px auto; max-width: 400px; }
+                li { background-color: #e7f1ff; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+                .form-group { margin-top: 20px; }
+                input, button { padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
+                button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
+                button:hover { background-color: #0056b3; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Payment to {{ uid }}</h1>
+                <h2>Balance: $<span id="balance">{{ "{:,}".format(user_balance) }}</span></h2>
+                <h3>Payment History</h3>
+                <ul id="history">
+                    {% for record in user_history %}
+                        <li>{{ record }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input id="amount" type="number" step="1" placeholder="Enter amount">
+                    <button onclick="sendPayment()">Pay</button>
+                </div>
+            </div>
+            <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
+            <script>
+                var socket = io();
+                var uid = "{{ uid }}";
+
+                // Join the room for this user
+                socket.emit('join', uid);
+
+                // Listen for balance updates
+                socket.on('update_balance', function(data) {
+                    if (data.uid === uid) {
+                        // Update balance
+                        document.getElementById("balance").textContent = data.balance.toLocaleString();
+
+                        // Update payment history
+                        const historyList = document.getElementById("history");
+                        historyList.innerHTML = ""; // Clear existing history
+                        data.history.forEach(record => {
+                            const li = document.createElement("li");
+                            li.textContent = record;
+                            historyList.appendChild(li);
+                        });
+                    }
+                });
+
+                // Send payment request
+                function sendPayment() {
+                    var amount = document.getElementById("amount").value;
+                    if (amount && parseInt(amount) > 0) {
+                        socket.emit('payment', {uid: uid, amount: parseInt(amount)});
+                        document.getElementById("amount").value = ''; // Clear input
+                    } else {
+                        alert("Please enter a valid amount!");
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        ''', uid=uid, user_balance=user_balance, user_history=user_history)
+
+    return render_template_string('''
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Social Pay</title>
-        <style>
-            body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
-            .container { text-align: center; padding: 20px; }
-            h1 { color: #333; }
-            ul { list-style-type: none; padding: 0; text-align: left; margin: 20px auto; max-width: 400px; }
-            li { background-color: #e7f1ff; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
-            .form-group { margin-top: 20px; }
-            input, button { padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-            button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
-            button:hover { background-color: #0056b3; }
-        </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Payment to {{ uid }}</h1>
-            <h2>Balance: ${{ "{:,}".format(user_balance) }}</h2>
-            <h3>Payment History</h3>
-            <ul>
-                {% for record in user_history %}
-                    <li>{{ record }}</li>
-                {% endfor %}
-            </ul>
-            <div class="form-group">
-                <label for="amount">Amount:</label>
-                <input id="amount" type="number" step="1" placeholder="Enter amount">
-                <button onclick="sendPayment()">Pay</button>
-            </div>
-        </div>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
-        <script>
-            var socket = io();
-            var uid = "{{ uid }}";
-            socket.emit('join', uid);
-
-            function sendPayment() {
-                var amount = document.getElementById("amount").value;
-                if (amount && parseInt(amount) > 0) {
-                    socket.emit('payment', {uid: uid, amount: parseInt(amount)});
-                    document.getElementById("amount").value = ''; // Clear input
-                } else {
-                    alert("Please enter a valid amount!");
-                }
-            }
-
-            socket.on('payment_success', function(data) {
-                var li = document.createElement("li");
-                li.textContent = data.message;
-                document.querySelector("ul").appendChild(li);
-            });
-        </script>
+        <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
+        <h1>Social Pay</h1>
+        <form method="post" action="/Social_Pay">
+            <label for="uid">Enter UID:</label>
+            <input type="text" id="uid" name="uid" required>
+            <button type="submit">Start Payment</button>
+        </form>
     </body>
     </html>
-''', uid=uid, user_history=user_history, user_balance=user_balance)
-
-    return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Social Pay</title>
-        </head>
-        <body>
-            <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-            <h1>Social Pay</h1>
-            <form method="post" action="/Social_Pay">
-                <label for="uid">Enter UID:</label>
-                <input type="text" id="uid" name="uid" required>
-                <button type="submit">Start Payment</button>
-            </form>
-        </body>
-        </html>
-    ''')
-    if request.method == 'POST' and 'uid' in request.form:
-        uid = request.form['uid']
-        user_history = payment_history.get(uid, [])
-        user_balance = user_balances.get(uid, 0.0)
-
-        return render_template_string('''
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Social Pay</title>
-                <style>
-                    body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
-                    .container { text-align: center; padding: 20px; }
-                    h1 { color: #333; }
-                    ul { list-style-type: none; padding: 0; text-align: left; margin: 20px auto; max-width: 400px; }
-                    li { background-color: #e7f1ff; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
-                    .form-group { margin-top: 20px; }
-                    input, button { padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-                    button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
-                    button:hover { background-color: #0056b3; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>Payment to {{ uid }}</h1>
-                    <h2>Balance: ${{ "%.2f" % user_balance }}</h2>
-                    <h3>Payment History</h3>
-                    <ul>
-                        {% for record in user_history %}
-                            <li>{{ record }}</li>
-                        {% endfor %}
-                    </ul>
-                    <div class="form-group">
-                        <label for="amount">Amount:</label>
-                        <input id="amount" type="number" step="0.01" placeholder="Enter amount">
-                        <button onclick="sendPayment()">Pay</button>
-                    </div>
-                </div>
-                <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
-                <script>
-                    var socket = io();
-                    var uid = "{{ uid }}";
-                    socket.emit('join', uid);
-
-                    function sendPayment() {
-                        var amount = document.getElementById("amount").value;
-                        if (amount && parseFloat(amount) > 0) {
-                            socket.emit('payment', {uid: uid, amount: parseFloat(amount)});
-                            document.getElementById("amount").value = ''; // Clear input
-                        } else {
-                            alert("Please enter a valid amount!");
-                        }
-                    }
-
-                    socket.on('payment_success', function(data) {
-                        var li = document.createElement("li");
-                        li.textContent = data.message;
-                        document.querySelector("ul").appendChild(li);
-                    });
-                </script>
-            </body>
-            </html>
-        ''', uid=uid, user_history=user_history, user_balance=user_balance)
-
-    return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Social Pay</title>
-        </head>
-        <body>
-            <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-            <h1>Social Pay</h1>
-            <form method="post" action="/Social_Pay">
-                <label for="uid">Enter UID:</label>
-                <input type="text" id="uid" name="uid" required>
-                <button type="submit">Start Payment</button>
-            </form>
-        </body>
-        </html>
     ''')
 
 
@@ -1597,7 +1526,7 @@ def handle_payment(data):
         send({"message": "Invalid payment amount!"}, to=uid)
         return
 
-    # Initialize balance with a random integer between 0 and 100,000 if user is new
+    # Initialize balance and history if user is new
     if uid not in user_balances:
         user_balances[uid] = random.randint(0, 100_000)  # Random balance
         payment_history[uid] = []
@@ -1607,8 +1536,12 @@ def handle_payment(data):
     payment_record = f"Received ${int(amount):,}"
     payment_history[uid].append(payment_record)
 
-    # Notify the client
-    send({"message": payment_record}, to=uid)
+    # Emit the updated balance and history to the client
+    socketio.emit('update_balance', {
+        'uid': uid,
+        'balance': user_balances[uid],
+        'history': payment_history[uid]
+    }, to=uid)
 
 
 if __name__ == '__main__':
