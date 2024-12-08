@@ -1426,7 +1426,7 @@ def social_chat():
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Social Chat</title>
+            <title>Chat with</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
             <style>
                 body { background-color: #f9f9f9; }
@@ -1497,7 +1497,7 @@ def social_chat():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Social Chat</title>
+        <title>Chat with</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body { background-color: #f9f9f9; }
@@ -1522,7 +1522,7 @@ def social_chat():
         </div>
         <div class="container form-container">
             <div class="form-header">
-                <h1>Social Chat</h1>
+                <h1>Chat with</h1>
             </div>
             <form method="post" action="/Social_Chat">
                 <div class="mb-3">
@@ -1555,7 +1555,7 @@ def social_pay():
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Social Pay</title>
+            <title>Pay to</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
             <style>
                 body { background-color: #f8f9fa; }
@@ -1658,7 +1658,7 @@ def social_pay():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Social Pay</title>
+        <title>Pay to</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body { background-color: #f8f9fa; }
@@ -1681,7 +1681,7 @@ def social_pay():
             </a>
         </div>
         <div class="container text-center">
-            <h1>Social Pay</h1>
+            <h1>Pay to</h1>
             <form method="post" action="/Social_Pay">
                 <div class="mb-3">
                     <label for="uid" class="form-label">Enter UID:</label>
