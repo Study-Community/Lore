@@ -1349,25 +1349,49 @@ def social_chat():
             return "Invalid UID! UID must be alphanumeric.", 400
 
         return render_template_string('''
-            <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-            <h1>Chat with {{ uid }}</h1>
-            <div id="chat">
-                <ul id="messages">
-                    {% for message in chat_history.get(uid, []) %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Social Chat</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body { background-color: #f9f9f9; }
+                .chat-container { margin: 20px auto; max-width: 600px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+                .chat-header { text-align: center; padding: 10px 0; }
+                .chat-messages { max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
+                .chat-messages ul { list-style: none; padding: 0; }
+                .chat-messages li { background: #e9f5ff; margin-bottom: 10px; padding: 10px; border-radius: 5px; }
+                .chat-input { display: flex; gap: 10px; }
+                .chat-input input { flex: 1; }
+            </style>
+        </head>
+        <body>
+            <div class="container chat-container">
+                <div class="chat-header">
+                    <h1>Chat with {{ uid }}</h1>
+                </div>
+                <div class="chat-messages">
+                    <ul id="messages">
+                        {% for message in chat_history.get(uid, []) %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="chat-input">
+                    <input id="message" type="text" class="form-control" placeholder="Type your message here...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
             </div>
-            <label for="message">Message:</label>
-            <input id="message" autocomplete="off"><button onclick="sendMessage()">Send</button>
-            <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
-            <script type="text/javascript" charset="utf-8">
+            <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+            <script>
                 var socket = io();
                 var uid = "{{ uid }}";
                 socket.emit('join', uid);
                 socket.on('message', function(msg){
                     var li = document.createElement("li");
-                    li.appendChild(document.createTextNode(msg));
+                    li.textContent = msg;
                     document.getElementById("messages").appendChild(li);
                 });
                 function sendMessage() {
@@ -1376,17 +1400,40 @@ def social_chat():
                     document.getElementById("message").value = '';  // Clear input after sending
                 }
             </script>
+        </body>
+        </html>
         ''', uid=uid, chat_history=chat_history)
 
     # Default chat form
     return render_template_string('''
-        <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Social Chat</h1>
-        <form method="post" action="/Social_Chat">
-            <label for="uid">Enter UID:</label>
-            <input type="text" id="uid" name="uid" required>
-            <button type="submit">Start Chat</button>
-        </form>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Social Chat</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { background-color: #f9f9f9; }
+            .form-container { margin: 100px auto; max-width: 400px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+            .form-header { text-align: center; margin-bottom: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container form-container">
+            <div class="form-header">
+                <h1>Social Chat</h1>
+            </div>
+            <form method="post" action="/Social_Chat">
+                <div class="mb-3">
+                    <label for="uid" class="form-label">Enter UID</label>
+                    <input type="text" id="uid" name="uid" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Start Chat</button>
+            </form>
+        </div>
+    </body>
+    </html>
     ''')
 
 @app.route('/Social_Pay', methods=['GET', 'POST'])
@@ -1409,35 +1456,34 @@ def social_pay():
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Social Pay</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
             <style>
-                body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
-                .container { text-align: center; padding: 20px; }
+                body { background-color: #f8f9fa; }
+                .container { max-width: 600px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
                 h1, h2, h3 { color: #333; }
-                ul { list-style-type: none; padding: 0; text-align: left; margin: 20px auto; max-width: 400px; }
-                li { background-color: #e7f1ff; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
-                .form-group { margin-top: 20px; }
-                input, button { padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-                button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
-                button:hover { background-color: #0056b3; }
+                ul { list-style-type: none; padding: 0; }
+                li { background-color: #e9f5ff; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+                .alert { margin-top: 20px; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <h1>Payment to {{ uid }}</h1>
-                <h2>Balance: $<span id="balance">{{ "{:,}".format(user_balance) }}</span></h2>
+            <div class="container text-center">
+                <h1>Payment to <span class="text-primary">{{ uid }}</span></h1>
+                <h2>Balance: $<span id="balance" class="text-success">{{ "{:,}".format(user_balance) }}</span></h2>
                 <h3>Payment History</h3>
-                <ul id="history">
+                <ul id="history" class="list-group">
                     {% for record in user_history %}
-                        <li>{{ record }}</li>
+                        <li class="list-group-item">{{ record }}</li>
                     {% endfor %}
                 </ul>
-                <div class="form-group">
-                    <label for="amount">Amount:</label>
-                    <input id="amount" type="number" step="1" placeholder="Enter amount">
-                    <button onclick="sendPayment()">Pay</button>
+                <div class="mt-4">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <input id="amount" type="number" step="1" class="form-control" placeholder="Enter amount">
+                    <button class="btn btn-primary mt-3" onclick="sendPayment()">Pay</button>
                 </div>
+                <div id="alert-container" class="mt-3"></div>
             </div>
-            <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
             <script>
                 var socket = io();
                 var uid = "{{ uid }}";
@@ -1457,8 +1503,11 @@ def social_pay():
                         data.history.forEach(record => {
                             const li = document.createElement("li");
                             li.textContent = record;
+                            li.classList.add('list-group-item');
                             historyList.appendChild(li);
                         });
+
+                        showAlert("Payment successful!", "success");
                     }
                 });
 
@@ -1469,8 +1518,19 @@ def social_pay():
                         socket.emit('payment', {uid: uid, amount: parseInt(amount)});
                         document.getElementById("amount").value = ''; // Clear input
                     } else {
-                        alert("Please enter a valid amount!");
+                        showAlert("Please enter a valid amount!", "danger");
                     }
+                }
+
+                // Show alert messages
+                function showAlert(message, type) {
+                    const alertContainer = document.getElementById("alert-container");
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
                 }
             </script>
         </body>
@@ -1484,15 +1544,23 @@ def social_pay():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Social Pay</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { background-color: #f8f9fa; }
+            .container { max-width: 400px; margin: 100px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        </style>
     </head>
     <body>
-        <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-        <h1>Social Pay</h1>
-        <form method="post" action="/Social_Pay">
-            <label for="uid">Enter UID:</label>
-            <input type="text" id="uid" name="uid" required>
-            <button type="submit">Start Payment</button>
-        </form>
+        <div class="container text-center">
+            <h1>Social Pay</h1>
+            <form method="post" action="/Social_Pay">
+                <div class="mb-3">
+                    <label for="uid" class="form-label">Enter UID:</label>
+                    <input type="text" id="uid" name="uid" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Start Payment</button>
+            </form>
+        </div>
     </body>
     </html>
     ''')
@@ -1546,3 +1614,4 @@ def handle_payment(data):
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5008, debug=True)
+
