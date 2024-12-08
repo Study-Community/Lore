@@ -22,6 +22,31 @@ rules = {
         "Machine learning is a subset of AI that allows systems to learn from data and improve over time.",
         "Web development involves creating websites and web applications using various technologies."
     ],
+    "Algorithms": [
+        "Algorithms should have a defined input and output.",
+        "Every algorithm must terminate after a finite number of steps.",
+        "Time complexity measures how execution time grows with input size.",
+        "Space complexity evaluates the memory used by an algorithm.",
+        "Divide-and-conquer splits problems into smaller subproblems for easier solving.",
+        "Greedy algorithms optimize step-by-step without backtracking.",
+        "Dynamic programming solves overlapping subproblems efficiently.",
+        "Backtracking explores all possible solutions to find the best fit.",
+        "Recursion requires a base case to terminate properly.",
+        "Algorithmic stability ensures consistent output with varying input conditions."
+    ],
+    "Operating Systems": [
+        "Operating systems manage communication between hardware and software.",
+        "Multitasking enables running multiple processes simultaneously.",
+        "Process synchronization ensures coordinated access to shared resources.",
+        "Deadlock prevention and detection are vital for process management.",
+        "Virtual memory allows systems to execute large programs beyond physical RAM.",
+        "Scheduling algorithms optimize CPU time allocation to processes.",
+        "File systems store, retrieve, and organize data on storage devices.",
+        "Interrupts allow devices to signal the processor for immediate attention.",
+        "User and kernel modes protect the operating system from unintended interference.",
+        "Security features safeguard against unauthorized access and malicious attacks."
+    ],
+
     "Science": [
         "The scientific method involves observation, hypothesis, experimentation, and conclusion.",
         "Matter is anything that has mass and takes up space.",
@@ -71,6 +96,7 @@ rules = {
         "The immune system protects the body from pathogens and foreign substances."
     ]
 }
+
 
 functions = [
     "Art",
@@ -275,10 +301,10 @@ def home():
         </head>
         <body>
             <div class="container">
-                <h1>Welcome</h1>
-                <a href="{{ url_for('knowledge_base') }}">Knowledge Base</a>
-                <a href="{{ url_for('explore_system') }}">Explore System</a>
-                <a href="{{ url_for('learn_system') }}">Learn System</a>
+                <h1>Learn with friends!</h1>
+                <a href="{{ url_for('knowledge_base') }}">Read System</a>
+                <a href="{{ url_for('note_system') }}">Note System</a>
+                <a href="{{ url_for('study_system') }}">Study System</a>
                 <a href="{{ url_for('exam_system') }}">Exam System</a>
                 <a href="{{ url_for('social_chat') }}">Chat System</a>
                 <a href="{{ url_for('social_pay') }}">Pay System</a>
@@ -296,11 +322,11 @@ def knowledge_base():
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Knowledge Base</title>
+            <title>Read System</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
-                    background-color: #f9f9f9;
+                    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
                     margin: 0;
                     padding: 0;
                     display: flex;
@@ -309,52 +335,84 @@ def knowledge_base():
                     height: 100vh;
                 }
                 .container {
+                    width: 95%; /* Increased width for more space */
+                    max-width: 1400px; /* Adjusted max width for larger screens */
                     background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                    padding: 40px; /* Added padding for spaciousness */
+                    border-radius: 15px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
                     text-align: center;
-                    max-width: 500px;
-                    width: 90%;
+                    overflow-y: auto;
+                    max-height: 90vh;
                 }
                 h1 {
                     color: #333;
-                    font-size: 24px;
+                    font-size: 32px;
+                    margin-bottom: 30px;
+                }
+                .grid-layout {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Flexible column sizing */
+                    gap: 20px; /* Spacing between buttons */
+                    justify-items: center;
+                    margin-top: 20px;
                 }
                 button {
-                    margin: 5px;
-                    padding: 10px 20px;
+                    width: 180px; /* Standard button size */
+                    height: 60px;
                     font-size: 16px;
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 10px;
                     background-color: #007BFF;
                     color: white;
                     cursor: pointer;
-                    transition: background-color 0.3s;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    transition: background-color 0.3s ease, transform 0.2s ease;
                 }
                 button:hover {
                     background-color: #0056b3;
+                    transform: scale(1.05);
                 }
-                a {
+                @media (max-width: 600px) {
+                    button {
+                        width: 140px; /* Smaller button size on mobile */
+                        height: 50px;
+                        font-size: 14px;
+                    }
+                }
+                .back-button {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
                     text-decoration: none;
-                    color: #007BFF;
-                    margin-top: 10px;
-                    display: inline-block;
+                    background-color: #88d498;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                    transition: background-color 0.3s, transform 0.2s;
                 }
-                a:hover {
-                    text-decoration: underline;
+                .back-button:hover {
+                    transform: scale(1.05);
+                    background-color: #66c282;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
-                <h1>Knowledge Base</h1>
-                <form method="post" action="/choose">
+                <div style="position: fixed; top: 20px; right: 20px;">
+                    <a href="{{ url_for('home') }}" class="back-button">Home</a>
+                </div>
+                <h1>Read System</h1>
+                <div class="grid-layout">
                     {% for function in functions %}
-                        <button type="submit" name="function" value="{{ function }}">{{ function }}</button>
+                        <form method="post" action="/choose">
+                            <button type="submit" name="function" value="{{ function }}">{{ function }}</button>
+                        </form>
                     {% endfor %}
-                </form>
+                </div>
             </div>
         </body>
         </html>
@@ -376,83 +434,110 @@ def choose():
             <title>{{ chosen_function }}</title>
             <style>
                 body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f9f9f9;
                     margin: 0;
                     padding: 0;
+                    font-family: Arial, sans-serif;
+                    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     height: 100vh;
                 }
                 .container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                    max-width: 500px;
                     width: 90%;
+                    max-width: 1200px;
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    overflow-y: auto;
+                    max-height: 90vh;
                 }
                 h1 {
                     color: #333;
-                    font-size: 24px;
+                    font-size: 28px;
+                    margin-bottom: 20px;
                 }
-                ul {
-                    list-style-type: disc;
-                    margin: 20px auto;
-                    padding: 0;
-                    text-align: left;
-                }
-                li {
-                    font-size: 16px;
-                    margin-bottom: 8px;
-                    color: #555;
+                .grid-layout {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                    gap: 15px;
+                    justify-items: center;
                 }
                 button {
-                    margin: 5px;
-                    padding: 10px 20px;
-                    font-size: 16px;
+                    width: 150px; /* Fixed width */
+                    height: 50px; /* Fixed height */
+                    font-size: 16px; /* Font size */
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 8px;
                     background-color: #007BFF;
                     color: white;
                     cursor: pointer;
-                    transition: background-color 0.3s;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+                    transition: background-color 0.3s ease, transform 0.2s ease;
                 }
                 button:hover {
                     background-color: #0056b3;
+                    transform: scale(1.05);
                 }
-                a {
+                @media (max-width: 600px) {
+                    button {
+                        width: 120px; /* Adjust for smaller screens */
+                        height: 40px;
+                        font-size: 14px;
+                    }
+                }
+                .content-block {
+                    text-align: left;
+                    margin: 20px auto;
+                    padding: 15px;
+                    border-radius: 10px;
+                    background: #f9f9f9;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    color: #555;
+                    font-size: 16px;
+                    line-height: 1.6;
+                }
+                .back-button {
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
                     text-decoration: none;
-                    color: #007BFF;
-                    margin-top: 10px;
-                    display: inline-block;
+                    background-color: #88d498;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                    transition: background-color 0.3s, transform 0.2s;
                 }
-                a:hover {
-                    text-decoration: underline;
+                .back-button:hover {
+                    transform: scale(1.05);
+                    background-color: #66c282;
                 }
             </style>
         </head>
         <body>
+            <a href="{{ url_for('knowledge_base') }}" class="back-button">Back</a>
             <div class="container">
-                <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
                 <h1>{{ chosen_function }}</h1>
-                <form method="post" action="/branch">
+                <div class="grid-layout">
                     {% for branch in branches %}
-                        <button type="submit" name="branch" value="{{ branch }}">{{ branch }}</button>
+                        <form method="post" action="/branch" style="display: inline;">
+                            <button type="submit" name="branch" value="{{ branch }}">{{ branch }}</button>
+                        </form>
                     {% endfor %}
-                </form>
-                <p>Content for {{ chosen_function }}</p>
-                <ul>
-                    {% for rule in important_rules %}
-                        <li>{{ rule }}</li>
-                    {% endfor %}
-                </ul>
-                <form method="post" action="/post_note">
-                    <input type="hidden" name="branch" value="{{ chosen_function }}">
-                    <button type="submit">Take Note</button>
-                </form>
+                </div>
+                <div class="content-block">
+                    <p><strong>Content for {{ chosen_function }}</strong></p>
+                    <ul>
+                        {% for rule in important_rules %}
+                            <li>{{ rule }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </body>
         </html>
@@ -474,76 +559,87 @@ def branch():
             <style>
                 body {
                     font-family: Arial, sans-serif;
-                    background-color: #f9f9f9;
+                    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
                     margin: 0;
                     padding: 0;
                     display: flex;
                     justify-content: center;
-                    align-items: center;
-                    height: 100vh;
+                    align-items: flex-start;
+                    min-height: 100vh;
                 }
                 .container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                    margin-top: 50px;
                     text-align: center;
-                    max-width: 500px;
+                    background: white;
+                    padding: 30px 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                    max-width: 600px;
                     width: 90%;
                 }
                 h1 {
                     color: #333;
-                    font-size: 24px;
+                    font-size: 28px;
+                    margin-bottom: 20px;
                 }
                 ul {
+                    text-align: left;
                     list-style-type: disc;
                     margin: 20px auto;
-                    padding: 0;
-                    text-align: left;
+                    padding: 0 20px;
+                    color: #555;
                 }
                 li {
                     font-size: 16px;
-                    margin-bottom: 8px;
-                    color: #555;
-                }
-                button {
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    border: none;
-                    border-radius: 5px;
-                    background-color: #007BFF;
-                    color: white;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                }
-                button:hover {
-                    background-color: #0056b3;
+                    margin-bottom: 10px;
                 }
                 a {
+                    display: block;
+                    margin: 10px auto;
+                    padding: 12px;
+                    font-size: 16px;
+                    font-weight: bold;
                     text-decoration: none;
-                    color: #007BFF;
-                    margin-top: 10px;
-                    display: inline-block;
+                    color: white;
+                    background-color: #007BFF;
+                    border-radius: 8px;
+                    width: fit-content;
+                    transition: background-color 0.3s ease, transform 0.2s ease;
                 }
                 a:hover {
-                    text-decoration: underline;
+                    background-color: #0056b3;
+                    transform: scale(1.05);
+                }
+                .back-button {
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    text-decoration: none;
+                    background-color: #88d498;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                    transition: background-color 0.3s, transform 0.2s;
+                }
+                .back-button:hover {
+                    transform: scale(1.05);
+                    background-color: #66c282;
                 }
             </style>
         </head>
         <body>
+            <a href="javascript:history.back()" class="back-button">Back</a>
             <div class="container">
-                <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
                 <h1>{{ chosen_branch }}</h1>
-                <p>Content for {{ chosen_branch }}</p>
                 <ul>
                     {% for rule in important_rules %}
                         <li>{{ rule }}</li>
                     {% endfor %}
                 </ul>
-                <form method="post" action="/post_note">
-                    <input type="hidden" name="branch" value="{{ chosen_branch }}">
-                    <button type="submit" class="subitem">Take Note</button>
-                </form>
+                <a href="{{ url_for('knowledge_base') }}">Back to Knowledge Base</a>
             </div>
         </body>
         </html>
@@ -618,7 +714,20 @@ def post_note():
         </head>
         <body>
             <div class="container">
-                <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
+                <div style="position: fixed; top: 20px; right: 20px;">
+                    <a href="{{ url_for('home') }}" 
+                    style="text-decoration: none; 
+                            background-color: #88d498; 
+                            color: white; 
+                            padding: 12px 24px; 
+                            border-radius: 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                            transition: background-color 0.3s, transform 0.2s;">
+                        Home
+                    </a>
+                </div>
                 <h1>Take Note in {{ branch }}</h1>
                 <form method="post" action="/publish_note">
                     <input type="hidden" name="branch" value="{{ branch }}">
@@ -686,24 +795,37 @@ def publish_note():
         </head>
         <body>
             <div class="container">
-                <div style="text-align: right;"><a href="{{ url_for('home') }}">Home</a></div>
+                <div style="position: fixed; top: 20px; right: 20px;">
+                    <a href="{{ url_for('home') }}" 
+                    style="text-decoration: none; 
+                            background-color: #88d498; 
+                            color: white; 
+                            padding: 12px 24px; 
+                            border-radius: 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                            transition: background-color 0.3s, transform 0.2s;">
+                        Home
+                    </a>
+                </div>
                 <h1>Note Published in {{ branch }}</h1>
                 <p>{{ note_content }}</p>
-                <a href="{{ url_for('explore_system') }}">Explore System</a>
+                <a href="{{ url_for('note_system') }}">Note System</a>
             </div>
         </body>
         </html>
     ''', branch=branch, note_content=note_content)
 
-@app.route('/explore_system')
-def explore_system():
+@app.route('/note_system')
+def note_system():
     return render_template_string('''
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Explore System</title>
+            <title>Note System</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -761,8 +883,21 @@ def explore_system():
         </head>
         <body>
             <div class="container">
-                <div class="home-link"><a href="{{ url_for('home') }}">Home</a></div>
-                <h1>Explore System</h1>
+                <div style="position: fixed; top: 20px; right: 20px;">
+                    <a href="{{ url_for('home') }}" 
+                    style="text-decoration: none; 
+                            background-color: #88d498; 
+                            color: white; 
+                            padding: 12px 24px; 
+                            border-radius: 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                            transition: background-color 0.3s, transform 0.2s;">
+                        Home
+                    </a>
+                </div>
+                <h1>Note System</h1>
                 <ul>
                     {% for main_area, branches in knowledge_areas.items() %}
                         <li>
@@ -843,7 +978,7 @@ def view_notes(area):
                         <li>{{ paper }}</li>
                     {% endfor %}
                 </ul>
-                <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+                <a href="{{ url_for('note_system') }}">Back to Note System</a>
             </div>
         </body>
         </html>
@@ -912,14 +1047,14 @@ def view_branch_notes(branch):
                         <li>{{ paper }}</li>
                     {% endfor %}
                 </ul>
-                <a href="{{ url_for('explore_system') }}">Back to Explore System</a>
+                <a href="{{ url_for('note_system') }}">Back to Note System</a>
             </div>
         </body>
         </html>
     ''', branch=branch, papers=papers)
 
-@app.route('/learn_system', methods=['GET', 'POST'])
-def learn_system():
+@app.route('/study_system', methods=['GET', 'POST'])
+def study_system():
     if request.method == 'POST':
         chosen_topic = request.form['topic']
         if chosen_topic in rules:
@@ -930,7 +1065,7 @@ def learn_system():
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Learn System</title>
+                    <title>Study System</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
@@ -987,15 +1122,28 @@ def learn_system():
                 </head>
                 <body>
                     <div class="container">
-                        <h1>Learn System</h1>
+                        <h1>Study System</h1>
                         <p><strong>Topic:</strong> {{ chosen_topic }}</p>
                         <p><strong>Rule:</strong> {{ rule }}</p>
-                        <form method="post" action="/learn_system">
+                        <form method="post" action="/study_system">
                             <input type="hidden" name="topic" value="{{ chosen_topic }}">
                             <button type="submit" name="action" value="master">Master</button>
                             <button type="submit" name="action" value="forget">Forget</button>
                         </form>
-                        <a href="{{ url_for('home') }}" class="home-link">Home</a>
+                        <div style="position: fixed; top: 20px; right: 20px;">
+                            <a href="{{ url_for('home') }}" 
+                            style="text-decoration: none; 
+                                    background-color: #88d498; 
+                                    color: white; 
+                                    padding: 12px 24px; 
+                                    border-radius: 20px; 
+                                    font-size: 16px; 
+                                    font-weight: bold; 
+                                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                                    transition: background-color 0.3s, transform 0.2s;">
+                                Home
+                            </a>
+                        </div>
                     </div>
                 </body>
                 </html>
@@ -1007,7 +1155,7 @@ def learn_system():
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Learn System</title>
+            <title>Study System</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -1070,8 +1218,8 @@ def learn_system():
         </head>
         <body>
             <div class="container">
-                <h1>Learn System</h1>
-                <form method="post" action="/learn_system">
+                <h1>Study System</h1>
+                <form method="post" action="/study_system">
                     <label for="topic">Choose a topic:</label>
                     <select id="topic" name="topic">
                         {% for function, branches in knowledge_areas.items() %}
@@ -1083,7 +1231,20 @@ def learn_system():
                     </select>
                     <button type="submit">Start Learning</button>
                 </form>
-                <a href="{{ url_for('home') }}" class="home-link">Home</a>
+                <div style="position: fixed; top: 20px; right: 20px;">
+                    <a href="{{ url_for('home') }}" 
+                    style="text-decoration: none; 
+                            background-color: #88d498; 
+                            color: white; 
+                            padding: 12px 24px; 
+                            border-radius: 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                            transition: background-color 0.3s, transform 0.2s;">
+                        Home
+                    </a>
+                </div>
             </div>
         </body>
         </html>
@@ -1100,90 +1261,51 @@ def exam_system():
             session['score'] = 0
             return redirect(url_for('take_exam'))
     return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Exam System</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f0f8ff;
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                }
-                .container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                    max-width: 400px;
-                    width: 90%;
-                }
-                h1 {
-                    color: #333;
-                    font-size: 24px;
-                }
-                form {
-                    margin-top: 20px;
-                }
-                select {
-                    padding: 10px;
-                    font-size: 16px;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    width: 100%;
-                    margin-bottom: 20px;
-                }
-                button {
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    border: none;
-                    border-radius: 5px;
-                    background-color: #007BFF;
-                    color: white;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                }
-                button:hover {
-                    background-color: #0056b3;
-                }
-                .home-link {
-                    text-decoration: none;
-                    color: #007BFF;
-                    margin-top: 10px;
-                    display: inline-block;
-                }
-                .home-link:hover {
-                    text-decoration: underline;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Exam System</h1>
-                <form method="post" action="/exam_system">
-                    <label for="topic">Choose a topic:</label>
-                    <select id="topic" name="topic">
-                        {% for function, branches in knowledge_areas.items() %}
-                            <option value="{{ function }}">{{ function }}</option>
-                            {% for branch in branches %}
-                                <option value="{{ branch }}">-- {{ branch }}</option>
-                            {% endfor %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exam System</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
+            .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; max-width: 400px; width: 90%; margin: 50px auto; }
+            h1 { color: #333; font-size: 24px; }
+            select, button { padding: 10px; font-size: 16px; margin-top: 20px; width: 100%; }
+            a { text-decoration: none; color: #88d498; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div style="position: fixed; top: 20px; right: 20px;">
+            <a href="{{ url_for('home') }}" 
+               style="text-decoration: none; 
+                      background-color: #88d498; 
+                      color: white; 
+                      padding: 12px 24px; 
+                      border-radius: 20px; 
+                      font-size: 16px; 
+                      font-weight: bold; 
+                      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                      transition: background-color 0.3s, transform 0.2s;">
+                Home
+            </a>
+        </div>
+        <div class="container">
+            <h1>Exam System</h1>
+            <form method="post" action="/exam_system">
+                <select name="topic">
+                    {% for function, branches in knowledge_areas.items() %}
+                        <option value="{{ function }}">{{ function }}</option>
+                        {% for branch in branches %}
+                            <option value="{{ branch }}">-- {{ branch }}</option>
                         {% endfor %}
-                    </select>
-                    <button type="submit">Start Exam</button>
-                </form>
-                <a href="{{ url_for('home') }}" class="home-link">Home</a>
-            </div>
-        </body>
-        </html>
+                    {% endfor %}
+                </select>
+                <button type="submit">Start Exam</button>
+            </form>
+        </div>
+    </body>
+    </html>
     ''', knowledge_areas=knowledge_areas)
 
 @app.route('/take_exam', methods=['GET', 'POST'])
@@ -1197,77 +1319,46 @@ def take_exam():
             return redirect(url_for('exam_result'))
     current_question = session['questions'][session['current_question']]
     return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Take Exam</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f0f8ff;
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                }
-                .container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                    max-width: 400px;
-                    width: 90%;
-                }
-                h1 {
-                    color: #333;
-                    font-size: 24px;
-                }
-                p {
-                    font-size: 18px;
-                    color: #555;
-                }
-                button {
-                    margin: 5px;
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    border: none;
-                    border-radius: 5px;
-                    background-color: #007BFF;
-                    color: white;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                }
-                button:hover {
-                    background-color: #0056b3;
-                }
-                .home-link {
-                    text-decoration: none;
-                    color: #007BFF;
-                    margin-top: 10px;
-                    display: inline-block;
-                }
-                .home-link:hover {
-                    text-decoration: underline;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Take Exam</h1>
-                <p><strong>Question:</strong> {{ current_question }}</p>
-                <form method="post" action="/take_exam">
-                    <button type="submit" name="action" value="correct">Correct</button>
-                    <button type="submit" name="action" value="incorrect">Incorrect</button>
-                </form>
-                <a href="{{ url_for('home') }}" class="home-link">Home</a>
-            </div>
-        </body>
-        </html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Take Exam</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
+            .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; max-width: 400px; width: 90%; margin: 50px auto; }
+            h1 { color: #333; font-size: 24px; }
+            p { font-size: 18px; color: #555; }
+            button { padding: 10px; font-size: 16px; margin: 10px; width: 45%; }
+            a { text-decoration: none; color: #88d498; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div style="position: fixed; top: 20px; right: 20px;">
+            <a href="{{ url_for('home') }}" 
+               style="text-decoration: none; 
+                      background-color: #88d498; 
+                      color: white; 
+                      padding: 12px 24px; 
+                      border-radius: 20px; 
+                      font-size: 16px; 
+                      font-weight: bold; 
+                      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                      transition: background-color 0.3s, transform 0.2s;">
+                Home
+            </a>
+        </div>
+        <div class="container">
+            <h1>Take Exam</h1>
+            <p><strong>Question:</strong> {{ current_question }}</p>
+            <form method="post" action="/take_exam">
+                <button type="submit" name="action" value="correct">Correct</button>
+                <button type="submit" name="action" value="incorrect">Incorrect</button>
+            </form>
+        </div>
+    </body>
+    </html>
     ''', current_question=current_question)
 
 @app.route('/exam_result')
@@ -1275,63 +1366,44 @@ def exam_result():
     score = session.get('score', 0)
     result = "Pass" if score >= 80 else "Fail"
     return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Exam Result</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f0f8ff;
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                }
-                .container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                    max-width: 400px;
-                    width: 90%;
-                }
-                h1 {
-                    color: #333;
-                    font-size: 24px;
-                }
-                p {
-                    font-size: 18px;
-                    color: #555;
-                }
-                a {
-                    text-decoration: none;
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    border-radius: 5px;
-                    background-color: #007BFF;
-                    color: white;
-                    transition: background-color 0.3s;
-                }
-                a:hover {
-                    background-color: #0056b3;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Exam Result</h1>
-                <p>Your score: <strong>{{ score }}</strong></p>
-                <p>Result: <strong>{{ result }}</strong></p>
-                <a href="{{ url_for('exam_system') }}">Back to Exam System</a>
-            </div>
-        </body>
-        </html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exam Result</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f0f8ff; margin: 0; padding: 0; }
+            .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; max-width: 400px; width: 90%; margin: 50px auto; }
+            h1 { color: #333; font-size: 24px; }
+            p { font-size: 18px; color: #555; }
+            a { text-decoration: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; background-color: #88d498; color: white; text-align: center; margin-top: 20px; display: inline-block; transition: background-color 0.3s; }
+            a:hover { background-color: #66c282; }
+        </style>
+    </head>
+    <body>
+        <div style="position: fixed; top: 20px; right: 20px;">
+            <a href="{{ url_for('home') }}" 
+               style="text-decoration: none; 
+                      background-color: #88d498; 
+                      color: white; 
+                      padding: 12px 24px; 
+                      border-radius: 20px; 
+                      font-size: 16px; 
+                      font-weight: bold; 
+                      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                      transition: background-color 0.3s, transform 0.2s;">
+                Home
+            </a>
+        </div>
+        <div class="container">
+            <h1>Exam Result</h1>
+            <p>Your score: <strong>{{ score }}</strong></p>
+            <p>Result: <strong>{{ result }}</strong></p>
+            <a href="{{ url_for('exam_system') }}">Back to Exam System</a>
+        </div>
+    </body>
+    </html>
     ''', score=score, result=result)
 
 
@@ -1368,6 +1440,20 @@ def social_chat():
             </style>
         </head>
         <body>
+            <div style="position: fixed; top: 20px; right: 20px;">
+                <a href="{{ url_for('home') }}" 
+                   style="text-decoration: none; 
+                          background-color: #88d498; 
+                          color: white; 
+                          padding: 12px 24px; 
+                          border-radius: 20px; 
+                          font-size: 16px; 
+                          font-weight: bold; 
+                          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                          transition: background-color 0.3s, transform 0.2s;">
+                    Home
+                </a>
+            </div>
             <div class="container chat-container">
                 <div class="chat-header">
                     <h1>Chat with {{ uid }}</h1>
@@ -1420,6 +1506,20 @@ def social_chat():
         </style>
     </head>
     <body>
+        <div style="position: fixed; top: 20px; right: 20px;">
+            <a href="{{ url_for('home') }}" 
+               style="text-decoration: none; 
+                      background-color: #88d498; 
+                      color: white; 
+                      padding: 12px 24px; 
+                      border-radius: 20px; 
+                      font-size: 16px; 
+                      font-weight: bold; 
+                      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                      transition: background-color 0.3s, transform 0.2s;">
+                Home
+            </a>
+        </div>
         <div class="container form-container">
             <div class="form-header">
                 <h1>Social Chat</h1>
@@ -1467,6 +1567,20 @@ def social_pay():
             </style>
         </head>
         <body>
+            <div style="position: fixed; top: 20px; right: 20px;">
+                <a href="{{ url_for('home') }}" 
+                   style="text-decoration: none; 
+                          background-color: #88d498; 
+                          color: white; 
+                          padding: 12px 24px; 
+                          border-radius: 20px; 
+                          font-size: 16px; 
+                          font-weight: bold; 
+                          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                          transition: background-color 0.3s, transform 0.2s;">
+                    Home
+                </a>
+            </div>
             <div class="container text-center">
                 <h1>Payment to <span class="text-primary">{{ uid }}</span></h1>
                 <h2>Balance: $<span id="balance" class="text-success">{{ "{:,}".format(user_balance) }}</span></h2>
@@ -1537,6 +1651,7 @@ def social_pay():
         </html>
         ''', uid=uid, user_balance=user_balance, user_history=user_history)
 
+    # Default payment form
     return render_template_string('''
     <!DOCTYPE html>
     <html lang="en">
@@ -1551,6 +1666,20 @@ def social_pay():
         </style>
     </head>
     <body>
+        <div style="position: fixed; top: 20px; right: 20px;">
+            <a href="{{ url_for('home') }}" 
+               style="text-decoration: none; 
+                      background-color: #88d498; 
+                      color: white; 
+                      padding: 12px 24px; 
+                      border-radius: 20px; 
+                      font-size: 16px; 
+                      font-weight: bold; 
+                      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+                      transition: background-color 0.3s, transform 0.2s;">
+                Home
+            </a>
+        </div>
         <div class="container text-center">
             <h1>Social Pay</h1>
             <form method="post" action="/Social_Pay">
@@ -1564,7 +1693,6 @@ def social_pay():
     </body>
     </html>
     ''')
-
 
 
 @socketio.on('join')
@@ -1613,5 +1741,5 @@ def handle_payment(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5008, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5010, debug=True)
 
