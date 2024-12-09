@@ -466,15 +466,15 @@ def choose():
                     justify-items: center;
                 }
                 button {
-                    width: 150px; /* Fixed width */
-                    height: 50px; /* Fixed height */
-                    font-size: 16px; /* Font size */
+                    width: 150px;
+                    height: 50px;
+                    font-size: 16px;
                     border: none;
                     border-radius: 8px;
                     background-color: #007BFF;
                     color: white;
                     cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                     transition: background-color 0.3s ease, transform 0.2s ease;
                 }
                 button:hover {
@@ -483,7 +483,7 @@ def choose():
                 }
                 @media (max-width: 600px) {
                     button {
-                        width: 120px; /* Adjust for smaller screens */
+                        width: 120px;
                         height: 40px;
                         font-size: 14px;
                     }
@@ -538,10 +538,16 @@ def choose():
                         {% endfor %}
                     </ul>
                 </div>
+                <form method="post" action="/post_note">
+                    <input type="hidden" name="branch" value="{{ chosen_function }}">
+                    <button type="submit">Take Note</button>
+                </form>
             </div>
         </body>
         </html>
     ''', chosen_function=chosen_function, branches=branches, important_rules=important_rules)
+
+
 
 @app.route('/branch', methods=['POST'])
 def branch():
@@ -593,20 +599,19 @@ def branch():
                     font-size: 16px;
                     margin-bottom: 10px;
                 }
-                a {
-                    display: block;
-                    margin: 10px auto;
-                    padding: 12px;
+                .take-note-button {
+                    margin-top: 20px;
+                    padding: 12px 24px;
                     font-size: 16px;
                     font-weight: bold;
-                    text-decoration: none;
                     color: white;
                     background-color: #007BFF;
-                    border-radius: 8px;
-                    width: fit-content;
-                    transition: background-color 0.3s ease, transform 0.2s ease;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: background-color 0.3s, transform 0.2s;
                 }
-                a:hover {
+                .take-note-button:hover {
                     background-color: #0056b3;
                     transform: scale(1.05);
                 }
@@ -639,7 +644,10 @@ def branch():
                         <li>{{ rule }}</li>
                     {% endfor %}
                 </ul>
-                <a href="{{ url_for('knowledge_base') }}">Back to Knowledge Base</a>
+                <form method="post" action="/post_note">
+                    <input type="hidden" name="branch" value="{{ chosen_branch }}">
+                    <button type="submit" class="take-note-button">Take Note</button>
+                </form>
             </div>
         </body>
         </html>
@@ -1741,5 +1749,5 @@ def handle_payment(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5010, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5002, debug=True)
 
