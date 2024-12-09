@@ -1,2 +1,2 @@
-# study-community-study-community
-study-community-study-community created by GitHub Classroom
+# Lore
+Learn Elegantly
